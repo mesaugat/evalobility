@@ -84,7 +84,8 @@ def determine_action(agent, query):
     result = agent.tool.use_agent(
         prompt=f"Query: {query}",
         system_prompt=ACTION_SYSTEM_PROMPT,
-        model="anthropic.claude-haiku-4-5-20251001-v1:0",
+        model_provider="bedrock",
+        model_settings={"model_id": "us.anthropic.claude-sonnet-4-20250514-v1:0"},
     )
 
     # Clean and extract the action
@@ -113,7 +114,8 @@ def run_kb_agent(query):
         answer = agent.tool.use_agent(
             prompt=query,
             system_prompt=SEARCH_SYSTEM_PROMPT,
-            model="us.anthropic.claude-haiku-4-5-20251001-v1:0",
+            model_provider="bedrock",
+            model_settings={"model_id": "us.anthropic.claude-sonnet-4-20250514-v1:0"},
         )
         print(answer)
     else:
@@ -134,7 +136,8 @@ def run_kb_agent(query):
         answer = agent.tool.use_agent(
             prompt=f'User question: "{query}"\n\nInformation from knowledge base:\n{result_str}\n\nStart your answer with newline character and provide a helpful answer based on this information:',
             system_prompt=ANSWER_SYSTEM_PROMPT,
-            model="anthropic.claude-haiku-4-5-20251001-v1:0",
+            model_provider="bedrock",
+            model_settings={"model_id": "us.anthropic.claude-sonnet-4-20250514-v1:0"},
         )
         print(answer)
 
