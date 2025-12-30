@@ -5,8 +5,8 @@ Knowledge Base Agent
 
 This agent demonstrates:
 - Connection to AWS Knowledge Base for ecommerce policy information retrieval
-- Intelligent determination of search vs. retrieve actions
-- Query answering from policy documents
+- Intelligent determination of search vs. retrieve action
+- Query answering from policy documents or general IT/security or ecommerce knowledge
 
 Prerequisites:
 - AWS credentials configured (via AWS CLI or environment variables)
@@ -14,23 +14,19 @@ Prerequisites:
 
 Environment Variables:
 - STRANDS_KNOWLEDGE_BASE_ID: Your AWS Knowledge Base ID
+- BEDROCK_GUARDRAIL_ID: Guardrail ID for Bedrock models
 
 How to Run:
 1. Set required environment variables
 2. Run: python knowledge_base_agent.py
-3. Enter queries about company policies at the prompt
-
-Example Queries:
-- "What is the password policy?"
-- "What are the MFA requirements?"
-- "What is the RTO for our payment system?"
-- "What is our incident response process?"
+3. Enter user queries
 """
 
 import os
 from dotenv import load_dotenv
 
 from strands import Agent
+from strands.models import BedrockModel
 from strands_tools import use_agent, memory
 
 load_dotenv(override=True)
@@ -42,14 +38,19 @@ if not os.environ.get("STRANDS_KNOWLEDGE_BASE_ID"):
         "To use a real knowledge base, please set the STRANDS_KNOWLEDGE_BASE_ID environment variable."
     )
 
-KB_ID = os.environ.get("STRANDS_KNOWLEDGE_BASE_ID")
+# Check for Bedrock Guardrail ID
+if not os.environ.get("BEDROCK_GUARDRAIL_ID"):
+    print("\n⚠️  WARNING: BEDROCK_GUARDRAIL_ID environment variable is not set!")
+    print(
+        "To use guardrails with Bedrock models, please set the BEDROCK_GUARDRAIL_ID environment variable."
+    )
 
 # System prompt to determine action
 ACTION_SYSTEM_PROMPT = """You are a knowledge base assistant focusing ONLY on classifying user queries.
 
 Your task is to determine whether a user query requires:
 - RETRIEVE: Fetching information from the internal knowledge base containing ecommerce company policies, procedures, and compliance documents
-- SEARCH: Searching the web for general knowledge, current events, or technical information not specific to the company
+- SEARCH: Searching for technical information not specific to the company
 
 Reply with EXACTLY ONE WORD - either "search" or "retrieve".
 DO NOT include any explanations or other text.
@@ -69,23 +70,24 @@ Examples:
 Only respond with "search" or "retrieve" - no explanation, prefix, or any other text."""
 
 # System prompt for generating answers from retrieved information
-ANSWER_SYSTEM_PROMPT = """You are a helpful assistant answering questions based on retrieved knowledge base content. Ignore metadata like IDs or scores. Be direct and concise with less than 50 words.
+ANSWER_SYSTEM_PROMPT = """You are a helpful assistant answering questions based on retrieved knowledge base content. Be direct and concise with less than 50 words.
 
 Examples:
-- "What is the password policy?" -> "Passwords must be 12+ characters with special symbols."
-- "What is the capital of France?" -> "Paris."
+- "What is the password policy?" -> "Passwords must be at least 12 characters, avoid common words and reused credentials, and prefer passphrases. Password managers are encouraged for employees."
+- "What are the latest cybersecurity trends?" -> "Cybersecurity is dominated by AI-driven threats, including automated malware and deepfake social engineering. Organizations are shifting toward Zero Trust architectures and post-quantum cryptography to safeguard against evolving computing power. Meanwhile, supply chain attacks and triple extortion ransomware remain critical risks to global infrastructure."
 """
 
-SEARCH_SYSTEM_PROMPT = """You are a helpful assistant that provides accurate, concise answers to general questions. Provide direct answers without mentioning your knowledge cutoff or sources."""
+SEARCH_SYSTEM_PROMPT = """You are a helpful assistant that provides accurate, concise answers to questions related to technical ecommerce or IT related topics. Provide direct answers within 50 words without mentioning your knowledge cutoff or sources. Do not answer questions unrelated to IT/security or ecommerce topics."""
 
 
 def determine_action(agent, query):
-    """Determine if the query is a search or retrieve action."""
+    """Determine if the user query is a search or retrieve action."""
+
     result = agent.tool.use_agent(
         prompt=f"Query: {query}",
         system_prompt=ACTION_SYSTEM_PROMPT,
         model_provider="bedrock",
-        model_settings={"model_id": "us.anthropic.claude-sonnet-4-20250514-v1:0"},
+        model_settings={"model_id": "us.anthropic.claude-haiku-4-5-20251001-v1:0"},
     )
 
     # Clean and extract the action
@@ -103,8 +105,17 @@ def determine_action(agent, query):
 
 def run_kb_agent(query):
     """Process a user query with the knowledge base agent."""
+
+    # Initialize Bedrock model with guardrails
+    bedrock_model = BedrockModel(
+        model_id="us.anthropic.claude-haiku-4-5-20251001-v1:0",
+        guardrail_id=os.environ.get("BEDROCK_GUARDRAIL_ID"),
+        guardrail_version="2",
+        guardrail_trace="enabled",
+    )
+
     # Initialize agent with tools
-    agent = Agent(tools=[memory, use_agent])
+    agent = Agent(tools=[memory, use_agent], model=bedrock_model)
 
     # Determine the action - search or retrieve
     action = determine_action(agent, query)
@@ -114,10 +125,7 @@ def run_kb_agent(query):
         answer = agent.tool.use_agent(
             prompt=query,
             system_prompt=SEARCH_SYSTEM_PROMPT,
-            model_provider="bedrock",
-            model_settings={"model_id": "us.anthropic.claude-sonnet-4-20250514-v1:0"},
         )
-        print(answer)
     else:
         # For retrieve actions, query the knowledge base
         result = agent.tool.memory(
@@ -130,16 +138,15 @@ def run_kb_agent(query):
         # Convert the result to a string to extract just the content text
         result_str = str(result)
 
-        print("\nRetrieved Information from Knowledge Base:\n", result_str)
-
         # Generate a clear, conversational answer using the retrieved information
         answer = agent.tool.use_agent(
             prompt=f'User question: "{query}"\n\nInformation from knowledge base:\n{result_str}\n\nStart your answer with newline character and provide a helpful answer based on this information:',
             system_prompt=ANSWER_SYSTEM_PROMPT,
             model_provider="bedrock",
-            model_settings={"model_id": "us.anthropic.claude-sonnet-4-20250514-v1:0"},
+            model_settings={"model_id": "amazon.nova-pro-v1:0"},
         )
-        print(answer)
+
+    print(answer)
 
 
 def main():
@@ -147,7 +154,7 @@ def main():
     # Print welcome message
     print("\n🧠 Knowledge Base Agent 🧠\n")
     print(
-        "This agent helps you retrieve information from the ecommerce company policy knowledge base."
+        "This agent helps you retrieve information from wwktm (an ecommerce company) policy knowledge base or search for general IT/security or ecommerce knowledge."
     )
     print("\nTry queries like:")
     print('- "What is the password policy?"')
