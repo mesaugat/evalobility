@@ -59,6 +59,35 @@ When answering questions:
 Be helpful, accurate, and conversational."""
 
 
+def create_agent_with_session(bedrock_model):
+    """Create a new agent with a fresh session.
+
+    Args:
+        bedrock_model: The BedrockModel instance to use for the agent
+
+    Returns:
+        tuple: (agent, session_id)
+    """
+    # Generate unique session ID
+    session_id = str(uuid.uuid4())
+
+    # Create session manager
+    session_manager = FileSessionManager(
+        session_id=session_id,
+        storage_dir="./sessions"
+    )
+
+    # Initialize agent with tools and session manager
+    agent = Agent(
+        tools=[memory, use_agent],
+        model=bedrock_model,
+        session_manager=session_manager,
+        system_prompt=MAIN_SYSTEM_PROMPT
+    )
+
+    return agent, session_id
+
+
 def run_kb_agent(agent, query):
     """Process a user query with the knowledge base agent."""
     # Simply call the agent - it will decide whether to use tools or not
@@ -70,14 +99,7 @@ def run_kb_agent(agent, query):
 def main():
     """Main entry point for the knowledge base agent."""
 
-    # Create a session manager with a unique session ID
-    session_id = str(uuid.uuid4())
-    session_manager = FileSessionManager(
-        session_id=session_id,
-        storage_dir="./sessions"  # Store sessions in a local directory
-    )
-
-    # Initialize Bedrock model with guardrails
+    # Initialize Bedrock model with guardrails (shared across sessions)
     bedrock_model = BedrockModel(
         model_id="us.anthropic.claude-haiku-4-5-20251001-v1:0",
         guardrail_id=os.environ.get("BEDROCK_GUARDRAIL_ID"),
@@ -86,13 +108,8 @@ def main():
         streaming=True
     )
 
-    # Initialize agent with tools and session manager (create once, reuse throughout session)
-    agent = Agent(
-        tools=[memory, use_agent],
-        model=bedrock_model,
-        session_manager=session_manager,
-        system_prompt=MAIN_SYSTEM_PROMPT
-    )
+    # Create initial agent and session
+    agent, session_id = create_agent_with_session(bedrock_model)
 
     # Print welcome message
     print("\n🧠 Knowledge Base Agent 🧠\n")
@@ -106,14 +123,26 @@ def main():
     print('- "What is the RTO for our payment system?"')
     print('- "What is our incident response process?"')
     print('- "What are the data retention requirements?"')
-    print("\nType your question below or 'exit' to quit:")
+    print("\nCommands:")
+    print('- Type "exit" or "/q" to exit')
+    print('- Type "restart" or "/r"to start a new session')
+    print("\nType your question below:")
 
     while True:
         try:
             user_input = input("\n> ")
-            if user_input.lower() in ["exit", "\q"]:
+            if user_input.lower() in ["exit", "/q"]:
                 print("\nGoodbye! 👋")
                 break
+
+            # Handle session restart
+            if user_input.lower() in ["restart", "/r"]:
+                print("\n🔄 Restarting session...\n")
+                # Create new agent and session
+                agent, session_id = create_agent_with_session(bedrock_model)
+                print(f"✓ New session started")
+                print(f"Session ID: {session_id}\n")
+                continue
 
             if not user_input.strip():
                 continue
