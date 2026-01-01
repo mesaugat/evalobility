@@ -33,12 +33,21 @@ from strands_tools import use_agent, memory
 
 load_dotenv(override=True)
 
+# Check for AWS credentials
+if not (os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY")):
+    print("\n⚠️  WARNING: AWS credentials are not set!")
+    print(
+        "Please configure your AWS credentials via the AWS CLI or set the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables."
+    )
+    exit(1)
+
 # Check for Knowledge Base ID
 if not os.environ.get("STRANDS_KNOWLEDGE_BASE_ID"):
     print("\n⚠️  WARNING: STRANDS_KNOWLEDGE_BASE_ID environment variable is not set!")
     print(
         "To use a real knowledge base, please set the STRANDS_KNOWLEDGE_BASE_ID environment variable."
     )
+    exit(1)
 
 # Check for Bedrock Guardrail ID
 if not os.environ.get("BEDROCK_GUARDRAIL_ID"):
@@ -46,6 +55,7 @@ if not os.environ.get("BEDROCK_GUARDRAIL_ID"):
     print(
         "To use guardrails with Bedrock models, please set the BEDROCK_GUARDRAIL_ID environment variable."
     )
+    exit(1)
 
 # System prompt for the main agent with knowledge base access
 MAIN_SYSTEM_PROMPT = """You are a helpful assistant for wwktm, an ecommerce company. You help answer questions about company policies, procedures, and compliance documents, as well as general IT/security and ecommerce topics.
@@ -118,15 +128,14 @@ def main():
         "This agent helps you retrieve information from wwktm (an ecommerce company) policy knowledge base or search for general IT/security or ecommerce knowledge."
     )
     print("\nTry queries like:")
-    print('- "What is the password policy?"')
-    print('- "What are the MFA requirements?"')
-    print('- "What is the RTO for our payment system?"')
-    print('- "What is our incident response process?"')
-    print('- "What are the data retention requirements?"')
+    print('- What is the password policy?')
+    print('- What are the MFA requirements?')
+    print('- What is the RTO for our payment system?')
+    print('- What is our incident response process?')
+    print('- What are the data retention requirements?')
     print("\nCommands:")
     print('- Type "exit" or "/q" to exit')
     print('- Type "restart" or "/r"to start a new session')
-    print("\nType your question below:")
 
     while True:
         try:
