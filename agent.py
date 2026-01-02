@@ -31,6 +31,8 @@ from strands.models import BedrockModel
 from strands.session.file_session_manager import FileSessionManager
 from strands_tools import use_agent, memory
 
+from strands.telemetry.config import StrandsTelemetry
+
 load_dotenv(override=True)
 
 # Check for AWS credentials
@@ -68,6 +70,9 @@ When answering questions:
 
 Be helpful, accurate, and conversational."""
 
+# Initialize telemetry with OTLP exporter
+# telemetry = StrandsTelemetry()
+# telemetry.setup_otlp_exporter()
 
 def create_agent_with_session(bedrock_model):
     """Create a new agent with a fresh session.
@@ -108,6 +113,8 @@ def run_kb_agent(agent, query):
 
 def main():
     """Main entry point for the knowledge base agent."""
+
+
 
     # Initialize Bedrock model with guardrails (shared across sessions)
     bedrock_model = BedrockModel(
