@@ -17,7 +17,7 @@ from agent_config import create_agent
 load_dotenv(override=True)
 
 
-def get_response(case: Case) -> str:
+def run_agent(case: Case) -> str:
     """
     Task function that runs the agent and returns the response.
 
@@ -33,6 +33,7 @@ def get_response(case: Case) -> str:
     )  # Disable console output during evaluation
 
     response = agent(case.input)
+
     return str(response)
 
 
@@ -41,31 +42,31 @@ test_cases = [
         name="policy-password",
         input="What is the password policy?",
         expected_output="Passwords must be at least 12 characters long, avoid common words and reused credentials. Passphrases are preferred. Password managers are encouraged.",
-        metadata={"category": "policy", "difficulty": "basic"},
+        metadata={"category": "policy"},
     ),
     Case[str, str](
         name="policy-mfa",
         input="What are the MFA requirements?",
         expected_output="Multi-factor authentication (MFA) is mandatory for administrative, engineering, finance roles, and access to sensitive systems.",
-        metadata={"category": "policy", "difficulty": "basic"},
+        metadata={"category": "policy"},
     ),
     Case[str, str](
         name="policy-rto",
         input="What is the RTO for our payment system?",
         expected_output="The Recovery Time Objective (RTO) for the payment system is ≤ 2 hours, and the Recovery Point Objective (RPO) is ≤ 15 minutes.",
-        metadata={"category": "policy", "difficulty": "basic"},
+        metadata={"category": "policy"},
     ),
     Case[str, str](
         name="general-encryption",
         input="What is the difference between symmetric and asymmetric encryption?",
         expected_output="Symmetric encryption uses the same key for encryption and decryption (e.g., AES), making it fast but requiring secure key distribution. Asymmetric encryption uses a public-private key pair (e.g., RSA).",
-        metadata={"category": "general", "difficulty": "basic"},
+        metadata={"category": "general"},
     ),
     Case[str, str](
         name="general-ddos",
         input="What is a DDoS attack?",
         expected_output="A Distributed Denial of Service (DDoS) attack attempts to overwhelm a system, network, or service with massive traffic from multiple sources, making it unavailable to legitimate users.",
-        metadata={"category": "general", "difficulty": "basic"},
+        metadata={"category": "general"},
     ),
 ]
 
@@ -122,7 +123,7 @@ def main():
     )
 
     experiment = Experiment[str, str](cases=test_cases, evaluators=[evaluator])
-    reports = experiment.run_evaluations(get_response)
+    reports = experiment.run_evaluations(run_agent)
 
     reports[0].run_display()
 

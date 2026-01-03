@@ -3,12 +3,14 @@ Common Agent Configuration
 Shared configuration for creating agents
 """
 
-import os
 from typing import Optional
 from strands import Agent
 from strands.models import BedrockModel
 from strands.session.session_manager import SessionManager
 from strands_tools import use_agent, memory
+
+MODEL_CLAUDE_HAIKU_4_5 = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+MODEL_AMAZON_NOVA_PRO = "us.amazon.nova-pro-v1:0"
 
 SYSTEM_PROMPT = """You are a helpful assistant for wwktm, an ecommerce company. You help answer questions about company policies, procedures, and compliance documents, as well as general IT/security and ecommerce topics.
 
@@ -21,9 +23,10 @@ Be helpful, accurate, and conversational."""
 
 
 def create_bedrock_model(
-    model_id: str = "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+    model_id: str = MODEL_CLAUDE_HAIKU_4_5,
     guardrail_id: str | None = None,
     guardrail_version: str | None = "1",
+    **kwargs
 ) -> BedrockModel:
     """
     Create a BedrockModel instance with default configuration.
@@ -41,6 +44,7 @@ def create_bedrock_model(
         model_id=model_id,
         guardrail_id=guardrail_id,
         guardrail_version=guardrail_version,
+        **kwargs
     )
 
 
