@@ -29,9 +29,17 @@ from dotenv import load_dotenv
 from strands import Agent
 from strands.session.file_session_manager import FileSessionManager
 from strands.telemetry.config import StrandsTelemetry
+from opentelemetry.sdk.resources import Resource
 
 from agent_config import create_bedrock_model, SYSTEM_PROMPT
 from strands_tools import use_agent, memory
+
+import logging
+
+logging.getLogger("strands").setLevel(os.environ.get("LOG_LEVEL", "INFO"))
+logging.basicConfig(
+    format="%(levelname)s | %(name)s | %(message)s", handlers=[logging.StreamHandler()]
+)
 
 load_dotenv(override=True)
 
@@ -101,8 +109,8 @@ def main():
     """Main entry point for the knowledge base agent."""
 
     # Initialize telemetry with OTLP exporter
-    # telemetry = StrandsTelemetry()
-    # telemetry.setup_otlp_exporter()
+    telemetry = StrandsTelemetry()
+    telemetry.setup_otlp_exporter()
 
     # Initialize Bedrock model with guardrails (shared across sessions)
     bedrock_model = create_bedrock_model()
@@ -117,11 +125,11 @@ def main():
         "This agent helps you retrieve information from wwktm (an ecommerce company) policy knowledge base or search for general IT/security or ecommerce knowledge."
     )
     print("\nTry queries like:")
-    print('- What is the password policy?')
-    print('- What are the MFA requirements?')
-    print('- What is the RTO for our payment system?')
-    print('- What is our incident response process?')
-    print('- What are the data retention requirements?')
+    print("- What is the password policy?")
+    print("- What are the MFA requirements?")
+    print("- What is the RTO for our payment system?")
+    print("- What is our incident response process?")
+    print("- What are the data retention requirements?")
     print("\nCommands:")
     print('- Type "exit" or "/q" to exit')
     print('- Type "restart" or "/r"to start a new session')
