@@ -54,6 +54,7 @@ def create_agent(
     system_prompt: str | None = None,
     tools: list | None = None,
     session_manager: Optional[SessionManager] = None,
+    **kwargs,
 ) -> Agent:
     """
     Create an Agent instance with default configuration.
@@ -82,4 +83,5 @@ def create_agent(
         model=model,
         system_prompt=system_prompt,
         session_manager=session_manager,
+        **kwargs,
     )
