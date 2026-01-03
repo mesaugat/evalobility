@@ -23,24 +23,19 @@ Be helpful, accurate, and conversational."""
 def create_bedrock_model(
     model_id: str = "us.anthropic.claude-haiku-4-5-20251001-v1:0",
     guardrail_id: str | None = None,
-    guardrail_version: str | None = "2",
+    guardrail_version: str | None = "1",
 ) -> BedrockModel:
     """
     Create a BedrockModel instance with default configuration.
 
     Args:
         model_id: Bedrock model identifier
-        guardrail_id: Optional guardrail ID (defaults to env var BEDROCK_GUARDRAIL_ID)
+        guardrail_id: Optional guardrail ID
         guardrail_version: Guardrail version
 
     Returns:
         Configured BedrockModel instance
     """
-    if guardrail_id is None:
-        guardrail_id = os.environ.get("BEDROCK_GUARDRAIL_ID")
-
-    if guardrail_version is None:
-        guardrail_version = os.environ.get("BEDROCK_GUARDRAIL_VERSION")
 
     return BedrockModel(
         model_id=model_id,

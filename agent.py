@@ -94,7 +94,13 @@ def main():
 
     # Create initial session
     session_manager = create_session()
-    agent = create_agent(model=bedrock_model, session_manager=session_manager)
+
+    agent = create_agent(
+        model=bedrock_model,
+        session_manager=session_manager,
+        guardrail_id=os.getenv("BEDROCK_GUARDRAIL_ID"),
+        guardrail_version=os.getenv("BEDROCK_GUARDRAIL_VERSION"),
+    )
 
     # Print welcome message
     print("\nwwktm Knowledge Base Agent\n")
@@ -124,7 +130,9 @@ def main():
                 print("\n🔄 Restarting session...\n")
                 session_manager = create_session()
                 agent = create_agent(
-                    model=bedrock_model, session_manager=session_manager
+                    model=bedrock_model,
+                    session_manager=session_manager,
+                    guardrail_version="2",
                 )
                 print(f"✓ New session started")
                 print(f"Session ID: {session_manager.session_id}\n")
