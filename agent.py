@@ -27,16 +27,18 @@ import uuid
 from dotenv import load_dotenv
 
 from strands import Agent
-from strands.models import BedrockModel
 from strands.session.file_session_manager import FileSessionManager
-from strands_tools import use_agent, memory
-
 from strands.telemetry.config import StrandsTelemetry
+
+from agent_config import create_bedrock_model, SYSTEM_PROMPT
+from strands_tools import use_agent, memory
 
 load_dotenv(override=True)
 
 # Check for AWS credentials
-if not (os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY")):
+if not (
+    os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY")
+):
     print("\n⚠️  WARNING: AWS credentials are not set!")
     print(
         "Please configure your AWS credentials via the AWS CLI or set the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables."
@@ -47,7 +49,7 @@ if not (os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCES
 if not os.environ.get("STRANDS_KNOWLEDGE_BASE_ID"):
     print("\n⚠️  WARNING: STRANDS_KNOWLEDGE_BASE_ID environment variable is not set!")
     print(
-        "To use a real knowledge base, please set the STRANDS_KNOWLEDGE_BASE_ID environment variable."
+        "To use a knowledge base, please set the STRANDS_KNOWLEDGE_BASE_ID environment variable."
     )
     exit(1)
 
@@ -59,20 +61,6 @@ if not os.environ.get("BEDROCK_GUARDRAIL_ID"):
     )
     exit(1)
 
-# System prompt for the main agent with knowledge base access
-MAIN_SYSTEM_PROMPT = """You are a helpful assistant for wwktm, an ecommerce company. You help answer questions about company policies, procedures, and compliance documents, as well as general IT/security and ecommerce topics.
-
-When answering questions:
-- Use the memory tool to retrieve information from the company's knowledge base for company-specific policies and procedures
-- Provide direct, concise answers (aim for less than 100 words unless more detail is requested)
-- Maintain conversation context to handle follow-up questions like "tell me more" or "can you elaborate"
-- For general technical questions (not company-specific), you can answer directly from your knowledge
-
-Be helpful, accurate, and conversational."""
-
-# Initialize telemetry with OTLP exporter
-# telemetry = StrandsTelemetry()
-# telemetry.setup_otlp_exporter()
 
 def create_agent_with_session(bedrock_model):
     """Create a new agent with a fresh session.
@@ -88,8 +76,7 @@ def create_agent_with_session(bedrock_model):
 
     # Create session manager
     session_manager = FileSessionManager(
-        session_id=session_id,
-        storage_dir="./sessions"
+        session_id=session_id, storage_dir="./sessions"
     )
 
     # Initialize agent with tools and session manager
@@ -97,7 +84,7 @@ def create_agent_with_session(bedrock_model):
         tools=[memory, use_agent],
         model=bedrock_model,
         session_manager=session_manager,
-        system_prompt=MAIN_SYSTEM_PROMPT
+        system_prompt=SYSTEM_PROMPT,
     )
 
     return agent, session_id
@@ -105,7 +92,6 @@ def create_agent_with_session(bedrock_model):
 
 def run_kb_agent(agent, query):
     """Process a user query with the knowledge base agent."""
-    # Simply call the agent - it will decide whether to use tools or not
     answer = agent(query)
 
     return answer
@@ -114,22 +100,18 @@ def run_kb_agent(agent, query):
 def main():
     """Main entry point for the knowledge base agent."""
 
-
+    # Initialize telemetry with OTLP exporter
+    # telemetry = StrandsTelemetry()
+    # telemetry.setup_otlp_exporter()
 
     # Initialize Bedrock model with guardrails (shared across sessions)
-    bedrock_model = BedrockModel(
-        model_id="us.anthropic.claude-haiku-4-5-20251001-v1:0",
-        guardrail_id=os.environ.get("BEDROCK_GUARDRAIL_ID"),
-        guardrail_version="2",
-        guardrail_trace="enabled",
-        streaming=True
-    )
+    bedrock_model = create_bedrock_model()
 
     # Create initial agent and session
     agent, session_id = create_agent_with_session(bedrock_model)
 
     # Print welcome message
-    print("\n🧠 Knowledge Base Agent 🧠\n")
+    print("\nwwktm Knowledge Base Agent\n")
     print(f"Session ID: {session_id}")
     print(
         "This agent helps you retrieve information from wwktm (an ecommerce company) policy knowledge base or search for general IT/security or ecommerce knowledge."
