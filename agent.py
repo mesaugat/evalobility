@@ -11,10 +11,7 @@ This agent demonstrates:
 Prerequisites:
 - AWS credentials configured (via AWS CLI or environment variables)
 - Knowledge Base ID set in environment (STRANDS_KNOWLEDGE_BASE_ID)
-
-Environment Variables:
-- STRANDS_KNOWLEDGE_BASE_ID: Your AWS Knowledge Base ID
-- BEDROCK_GUARDRAIL_ID: Guardrail ID for Bedrock models
+- Bedrock Guardrail ID set in environment (BEDROCK_GUARDRAIL_ID)
 
 How to Run:
 1. Set required environment variables
@@ -29,25 +26,23 @@ from dotenv import load_dotenv
 from strands import Agent
 from strands.session.file_session_manager import FileSessionManager
 from strands.telemetry.config import StrandsTelemetry
-from opentelemetry.sdk.resources import Resource
 
-from agent_config import create_bedrock_model, SYSTEM_PROMPT
-from strands_tools import use_agent, memory
+from agent_config import create_bedrock_model, create_agent
 
 import logging
 
-logging.getLogger("strands").setLevel(os.environ.get("LOG_LEVEL", "INFO"))
+load_dotenv(override=True)
+
+logging.getLogger("strands").setLevel(os.getenv("LOG_LEVEL", "INFO"))
 logging.basicConfig(
     format="%(levelname)s | %(name)s | %(message)s", handlers=[logging.StreamHandler()]
 )
-
-load_dotenv(override=True)
 
 # Check for AWS credentials
 if not (
     os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY")
 ):
-    print("\n⚠️  WARNING: AWS credentials are not set!")
+    print("\nWARNING: AWS credentials are not set!")
     print(
         "Please configure your AWS credentials via the AWS CLI or set the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables."
     )
@@ -55,7 +50,7 @@ if not (
 
 # Check for Knowledge Base ID
 if not os.environ.get("STRANDS_KNOWLEDGE_BASE_ID"):
-    print("\n⚠️  WARNING: STRANDS_KNOWLEDGE_BASE_ID environment variable is not set!")
+    print("\nWARNING: STRANDS_KNOWLEDGE_BASE_ID environment variable is not set!")
     print(
         "To use a knowledge base, please set the STRANDS_KNOWLEDGE_BASE_ID environment variable."
     )
@@ -63,39 +58,11 @@ if not os.environ.get("STRANDS_KNOWLEDGE_BASE_ID"):
 
 # Check for Bedrock Guardrail ID
 if not os.environ.get("BEDROCK_GUARDRAIL_ID"):
-    print("\n⚠️  WARNING: BEDROCK_GUARDRAIL_ID environment variable is not set!")
+    print("\nWARNING: BEDROCK_GUARDRAIL_ID environment variable is not set!")
     print(
         "To use guardrails with Bedrock models, please set the BEDROCK_GUARDRAIL_ID environment variable."
     )
     exit(1)
-
-
-def create_agent_with_session(bedrock_model):
-    """Create a new agent with a fresh session.
-
-    Args:
-        bedrock_model: The BedrockModel instance to use for the agent
-
-    Returns:
-        tuple: (agent, session_id)
-    """
-    # Generate unique session ID
-    session_id = str(uuid.uuid4())
-
-    # Create session manager
-    session_manager = FileSessionManager(
-        session_id=session_id, storage_dir="./sessions"
-    )
-
-    # Initialize agent with tools and session manager
-    agent = Agent(
-        tools=[memory, use_agent],
-        model=bedrock_model,
-        session_manager=session_manager,
-        system_prompt=SYSTEM_PROMPT,
-    )
-
-    return agent, session_id
 
 
 def run_kb_agent(agent, query):
@@ -103,6 +70,16 @@ def run_kb_agent(agent, query):
     answer = agent(query)
 
     return answer
+
+
+def create_session():
+    """Create a new session and return session_manager."""
+    session_id = str(uuid.uuid4())
+    session_manager = FileSessionManager(
+        session_id=session_id, storage_dir="./sessions"
+    )
+
+    return session_manager
 
 
 def main():
@@ -115,12 +92,13 @@ def main():
     # Initialize Bedrock model with guardrails (shared across sessions)
     bedrock_model = create_bedrock_model()
 
-    # Create initial agent and session
-    agent, session_id = create_agent_with_session(bedrock_model)
+    # Create initial session
+    session_manager = create_session()
+    agent = create_agent(model=bedrock_model, session_manager=session_manager)
 
     # Print welcome message
     print("\nwwktm Knowledge Base Agent\n")
-    print(f"Session ID: {session_id}")
+    print(f"Session ID: {session_manager.session_id}")
     print(
         "This agent helps you retrieve information from wwktm (an ecommerce company) policy knowledge base or search for general IT/security or ecommerce knowledge."
     )
@@ -144,10 +122,12 @@ def main():
             # Handle session restart
             if user_input.lower() in ["restart", "/r"]:
                 print("\n🔄 Restarting session...\n")
-                # Create new agent and session
-                agent, session_id = create_agent_with_session(bedrock_model)
+                session_manager = create_session()
+                agent = create_agent(
+                    model=bedrock_model, session_manager=session_manager
+                )
                 print(f"✓ New session started")
-                print(f"Session ID: {session_id}\n")
+                print(f"Session ID: {session_manager.session_id}\n")
                 continue
 
             if not user_input.strip():

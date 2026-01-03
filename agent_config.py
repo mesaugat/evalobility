@@ -4,10 +4,11 @@ Shared configuration for creating agents
 """
 
 import os
+from typing import Optional
 from strands import Agent
 from strands.models import BedrockModel
+from strands.session.session_manager import SessionManager
 from strands_tools import use_agent, memory
-
 
 SYSTEM_PROMPT = """You are a helpful assistant for wwktm, an ecommerce company. You help answer questions about company policies, procedures, and compliance documents, as well as general IT/security and ecommerce topics.
 
@@ -52,7 +53,7 @@ def create_agent(
     model: BedrockModel | None = None,
     system_prompt: str | None = None,
     tools: list | None = None,
-    callback_handler=None,
+    session_manager: Optional[SessionManager] = None,
 ) -> Agent:
     """
     Create an Agent instance with default configuration.
@@ -76,8 +77,9 @@ def create_agent(
         tools = [memory, use_agent]
 
     return Agent(
+        name="wwktm-kb-agent",
         tools=tools,
         model=model,
         system_prompt=system_prompt,
-        callback_handler=callback_handler,
+        session_manager=session_manager,
     )
