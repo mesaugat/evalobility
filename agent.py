@@ -10,7 +10,7 @@ This agent demonstrates:
 
 Prerequisites:
 - AWS credentials configured (via AWS CLI or environment variables)
-- Knowledge Base ID set in environment (STRANDS_KNOWLEDGE_BASE_ID)
+- Knowledge Base ID set in environment (KNOWLEDGE_BASE_ID)
 - Bedrock Guardrail ID set in environment (BEDROCK_GUARDRAIL_ID)
 
 How to Run:
@@ -49,10 +49,10 @@ if not (
     exit(1)
 
 # Check for Knowledge Base ID
-if not os.environ.get("STRANDS_KNOWLEDGE_BASE_ID"):
-    print("\nWARNING: STRANDS_KNOWLEDGE_BASE_ID environment variable is not set!")
+if not os.environ.get("KNOWLEDGE_BASE_ID"):
+    print("\nWARNING: KNOWLEDGE_BASE_ID environment variable is not set!")
     print(
-        "To use a knowledge base, please set the STRANDS_KNOWLEDGE_BASE_ID environment variable."
+        "To use a knowledge base, please set the KNOWLEDGE_BASE_ID environment variable."
     )
     exit(1)
 
@@ -85,22 +85,17 @@ def create_session():
 def main():
     """Main entry point for the knowledge base agent."""
 
+    # Create initial session
+    session_manager = create_session()
+
+    # Setup telemetry
     # Initialize telemetry with OTLP exporter
     telemetry = StrandsTelemetry()
     telemetry.setup_otlp_exporter()
 
-    # Initialize Bedrock model with guardrails (shared across sessions)
     bedrock_model = create_bedrock_model()
 
-    # Create initial session
-    session_manager = create_session()
-
-    agent = create_agent(
-        model=bedrock_model,
-        session_manager=session_manager,
-        guardrail_id=os.getenv("BEDROCK_GUARDRAIL_ID"),
-        guardrail_version=os.getenv("BEDROCK_GUARDRAIL_VERSION"),
-    )
+    agent = create_agent(model=bedrock_model, session_manager=session_manager)
 
     # Print welcome message
     print("\nwwktm Knowledge Base Agent\n")
@@ -129,11 +124,11 @@ def main():
             if user_input.lower() in ["restart", "/r"]:
                 print("\n🔄 Restarting session...\n")
                 session_manager = create_session()
+
                 agent = create_agent(
-                    model=bedrock_model,
-                    session_manager=session_manager,
-                    guardrail_version="2",
+                    model=bedrock_model, session_manager=session_manager
                 )
+
                 print(f"✓ New session started")
                 print(f"Session ID: {session_manager.session_id}\n")
                 continue
