@@ -21,15 +21,14 @@ How to Run:
 
 import os
 import uuid
+import logging
+
 from dotenv import load_dotenv
 
-from strands import Agent
 from strands.session.file_session_manager import FileSessionManager
 from strands.telemetry.config import StrandsTelemetry
 
 from agent_config import create_bedrock_model, create_agent
-
-import logging
 
 load_dotenv(override=True)
 

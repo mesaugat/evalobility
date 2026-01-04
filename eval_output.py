@@ -2,10 +2,12 @@
 
 """
 Simple Evaluation for Knowledge Base Agent
-https://strandsagents.com/latest/documentation/docs/user-guide/evals-sdk/quickstart/
 
 This script demonstrates basic output evaluation using the Strands Evals SDK.
 """
+
+import os
+import logging
 
 from dotenv import load_dotenv
 
@@ -16,6 +18,10 @@ from agent_config import create_agent
 
 load_dotenv(override=True)
 
+logging.getLogger("strands").setLevel(os.getenv("LOG_LEVEL", "INFO"))
+logging.basicConfig(
+    format="%(levelname)s | %(name)s | %(message)s", handlers=[logging.StreamHandler()]
+)
 
 def run_agent(case: Case) -> str:
     """
@@ -113,7 +119,7 @@ OUTPUT_EVALUATOR_RUBRIC = """Compare the actual response to the expected output 
 
 def main():
     """Run the evaluation."""
-    print("EVAL: SIMPLE")
+    print("EVAL: OUTPUT")
     print(f"Running {len(test_cases)} test cases...")
 
     evaluator = OutputEvaluator(

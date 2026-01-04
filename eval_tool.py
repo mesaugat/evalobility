@@ -6,6 +6,9 @@ Tool Call Accuracy Evaluation
 This script evaluates whether the agent uses the correct tools for different types of queries.
 """
 
+import os
+import logging
+
 from dotenv import load_dotenv
 
 from strands_evals import Case, Experiment
@@ -15,6 +18,11 @@ from strands_evals.telemetry.config import StrandsEvalsTelemetry
 from agent_config import MODEL_AMAZON_NOVA_PRO, create_agent
 
 load_dotenv(override=True)
+
+logging.getLogger("strands").setLevel(os.getenv("LOG_LEVEL", "INFO"))
+logging.basicConfig(
+    format="%(levelname)s | %(name)s | %(message)s", handlers=[logging.StreamHandler()]
+)
 
 # Setup telemetry
 telemetry = StrandsEvalsTelemetry().setup_in_memory_exporter()
