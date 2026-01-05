@@ -1,0 +1,15 @@
+question,expected_answer,policy_source,category
+What is the minimum password length requirement at wwktm?,Passwords must be at least 12 characters,Password & Authentication Policy,password
+What is the RTO for the payments system?,RTO ≤ 2 hours,Business Continuity & Disaster Recovery Policy,bcdr
+What is the RPO for the core commerce platform?,RPO ≤ 1 hour,Business Continuity & Disaster Recovery Policy,bcdr
+Does wwktm store full card PAN/CVV?,No - wwktm does not store or transmit full PAN/CVV,Payment Processing & PCI Alignment Policy,payments
+What password hashing algorithms are acceptable?,bcrypt/Argon2/PBKDF2 with strong parameters,Password & Authentication Policy,password
+How often should BC/DR failover tests be conducted?,Semi-annual failover tests,Business Continuity & Disaster Recovery Policy,bcdr
+What TLS version is required for authentication traffic?,TLS 1.2+,Password & Authentication Policy,password
+What is the RPO for payments?,RPO ≤ 15 minutes,Business Continuity & Disaster Recovery Policy,bcdr
+Is MFA required?,Yes - MFA must be enabled,Password & Authentication Policy,password
+What payment model does wwktm prefer?,SAQ-A models (redirect or iFrame) where card data is processed by certified gateways,Payment Processing & PCI Alignment Policy,payments
+Can employees share passwords?,No - credential sharing is prohibited,Password & Authentication Policy,password
+What fraud prevention measures are used for payments?,Velocity checks address verification device fingerprinting and manual review queues for high-risk transactions,Payment Processing & PCI Alignment Policy,payments
+How is personal data protected in transit?,Encryption in transit using TLS,Privacy Policy,privacy
+What is the purpose of wwktm's privacy policy?,Explains how the company collects uses discloses and protects personal data,Privacy Policy,privacy

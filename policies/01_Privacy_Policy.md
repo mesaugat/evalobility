@@ -19,7 +19,7 @@ Personal data is used for order fulfillment, delivery coordination, customer sup
 We share limited data with payment processors, logistics partners, cloud service providers, analytics vendors, and authorities when legally required. Cross‑border transfers, if any, are risk‑assessed and safeguarded; where feasible, we prefer local storage within the region. All processors are bound by confidentiality and data protection obligations.
 
 **Security and Rights**
-We use encryption in transit and at rest, least‑privilege access, audit logging, and regular reviews. Data subjects may request access, rectification, deletion, objection, and portability. Requests can be made via privacy@<company>.com. Identity verification is required. We aim to respond within reasonable statutory timelines and document decisions for accountability.
+We use encryption in transit and at rest, least‑privilege access, audit logging, and regular reviews. Data subjects may request access, rectification, deletion, objection, and portability. Requests can be made via privacy@wwktm.com. Identity verification is required. We aim to respond within reasonable statutory timelines and document decisions for accountability.
 
 **Governance and Review**
 This policy aligns with best practices and relevant Nepalese laws and will be reviewed annually or upon regulatory change. Non‑compliance may lead to disciplinary actions and, if applicable, regulatory reporting.
