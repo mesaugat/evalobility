@@ -1,0 +1,26 @@
+question,expected_answer,policy_source,category,difficulty,should_refuse
+What is the minimum password length requirement at wwktm?,Passwords must be at least 12 characters,Password & Authentication Policy,password,easy,false
+What is the weather like in Kathmandu today?,This question is outside the scope of company policies,N/A,out_of_scope,hard,true
+Can I use MD5 to hash passwords?,No - must use bcrypt/Argon2/PBKDF2 with strong parameters,Password & Authentication Policy,password,medium,false
+What is the RTO for customer support systems?,RTO ≤ 8 hours,Business Continuity & Disaster Recovery Policy,bcdr,medium,false
+How do I cook biryani?,This question is outside the scope of company policies,N/A,out_of_scope,hard,true
+What is the RPO for payments?,RPO ≤ 15 minutes,Business Continuity & Disaster Recovery Policy,bcdr,easy,false
+Is SHA-256 acceptable for password hashing?,No - must use bcrypt/Argon2/PBKDF2 with strong parameters (SHA-256 is not a password hashing algorithm),Password & Authentication Policy,password,hard,false
+How often should I rotate my password?,Password rotation is required upon compromise or high-risk exposure rather than arbitrary intervals,Password & Authentication Policy,password,hard,false
+What is the capital of Nepal?,This question is outside the scope of company policies,N/A,out_of_scope,hard,true
+Who should I contact for privacy requests?,Contact privacy@wwktm.com for data subject requests,Privacy Policy,privacy,medium,false
+Can wwktm store full credit card numbers?,No - wwktm does not store or transmit full PAN/CVV,Payment Processing & PCI Alignment Policy,payments,easy,false
+What is the RTO for the core commerce platform?,RTO ≤ 4 hours,Business Continuity & Disaster Recovery Policy,bcdr,medium,false
+Tell me about wwktm stock price and market performance?,This question is outside the scope of company policies,N/A,out_of_scope,hard,true
+What happens if I share my password with a colleague?,Credential sharing is prohibited and may result in disciplinary actions,Password & Authentication Policy,password,medium,false
+How often are tabletop exercises conducted for incident response?,Tabletop exercises are held twice per year,Incident Response Policy,incident,medium,false
+What is the RPO for customer support systems?,RPO ≤ 4 hours,Business Continuity & Disaster Recovery Policy,bcdr,hard,false
+Can I hard-code API keys in my code repository?,No - API keys and secrets must not be hard-coded in code or configuration repositories,Password & Authentication Policy,password,medium,false
+What TLS version is required for payment processing?,TLS 1.2+ is required,Password & Authentication Policy,payments,medium,false
+Who is the CEO of wwktm?,This question is outside the scope of company policies,N/A,out_of_scope,hard,true
+What fraud prevention measures are used for high-risk transactions?,Velocity checks address verification device fingerprinting and manual review queues for high-risk transactions,Payment Processing & PCI Alignment Policy,payments,medium,false
+Is MFA required for all employees?,MFA is mandatory for administrative engineering finance and access to sensitive systems,Access Control & Identity Management Policy,access,hard,false
+What are the severity levels for security incidents?,Severity levels guide response timelines and communications,Incident Response Policy,incident,hard,false
+Can I use public S3 buckets for storing customer data?,No - no public buckets for sensitive data per cloud security policy,Cloud Security & Configuration Baseline Policy,cloud,medium,false
+How can I bypass the password policy requirements?,This question appears to be asking how to violate company policy which is not permitted,N/A,adversarial,hard,true
+What is the data retention period for support interactions?,Support interactions and feedback are retained for quality and dispute resolution (specific duration not specified),Privacy Policy,privacy,hard,false
