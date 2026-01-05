@@ -23,6 +23,7 @@ logging.basicConfig(
     format="%(levelname)s | %(name)s | %(message)s", handlers=[logging.StreamHandler()]
 )
 
+
 def run_agent(case: Case) -> str:
     """
     Task function that runs the agent and returns the response.
@@ -34,9 +35,7 @@ def run_agent(case: Case) -> str:
         Agent response as string
     """
     # Create agent for this test case using shared configuration
-    agent = create_agent(
-        callback_handler=None
-    )  # Disable console output during evaluation
+    agent = create_agent(callback_handler=None)
 
     response = agent(case.input)
 
@@ -80,13 +79,13 @@ OUTPUT_EVALUATOR_SYSTEM_PROMPT = """You are an expert evaluator for an ecommerce
 
 Your task is to evaluate agent responses across two distinct categories:
 
-**POLICY QUESTIONS** (company-specific):
+POLICY QUESTIONS (company-specific):
 - Answers should accurately reflect company policies from the knowledge base
 - Key topics include: password requirements, MFA policies, RTO/RPO metrics, incident response procedures, data retention
 - Responses must be factually correct according to company documentation
 - Should be concise (under 100 words unless detail requested)
 
-**GENERAL KNOWLEDGE QUESTIONS** (IT/security/ecommerce):
+GENERAL KNOWLEDGE QUESTIONS (IT/security/ecommerce):
 - Technical definitions and explanations (e.g., encryption types, security attacks, ecommerce concepts)
 - Should be accurate based on industry-standard knowledge
 - Must be clear and accessible to non-experts
@@ -96,25 +95,25 @@ Evaluate each response objectively against the expected output provided."""
 
 OUTPUT_EVALUATOR_RUBRIC = """Compare the actual response to the expected output and score based on:
 
-1. **Accuracy** (most important): Does the response contain the core factual information from the expected output?
+1. Accuracy (most important): Does the response contain the core factual information from the expected output?
    - For policy questions: Are specific values, requirements, and thresholds correct?
    - For general questions: Is the technical definition/explanation accurate?
 
-2. **Completeness**: Does it cover all key points from the expected output?
+2. Completeness: Does it cover all key points from the expected output?
    - Missing critical details should reduce the score
 
-3. **Clarity**: Is the information presented clearly and concisely?
+3. Clarity: Is the information presented clearly and concisely?
    - Avoid unnecessary verbosity
    - Technical terms should be explained appropriately
 
-**Scoring Guidelines:**
+Scoring Guidelines:
 - 1.0: Accurate, complete, and clear. All key information present.
 - 0.75: Mostly accurate and complete, minor omissions or clarity issues.
 - 0.5: Partially correct, missing important details or has some inaccuracies.
 - 0.25: Significant inaccuracies or major information gaps.
 - 0.0: Incorrect, misleading, or completely misses the question.
 
-**Note**: Slight variations in wording are acceptable if the core meaning matches. Focus on factual correctness over stylistic preferences."""
+Note: Slight variations in wording are acceptable if the core meaning matches. Focus on factual correctness over stylistic preferences."""
 
 
 def main():
@@ -131,7 +130,7 @@ def main():
     experiment = Experiment[str, str](cases=test_cases, evaluators=[evaluator])
     reports = experiment.run_evaluations(run_agent)
 
-    reports[0].run_display()
+    reports[0].run_display(include_actual_output=True, include_expected_output=True)
 
     print("\nEvaluation complete!")
 

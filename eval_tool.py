@@ -88,7 +88,9 @@ def main():
     experiment = Experiment[str, str](cases=test_cases, evaluators=[evaluator])
     reports = experiment.run_evaluations(run_agent)
 
-    reports[0].run_display()
+    reports[0].run_display(
+        include_actual_trajectory=True, include_expected_trajectory=True
+    )
 
     print("\nEvaluation complete!")
 

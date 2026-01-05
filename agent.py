@@ -92,7 +92,10 @@ def main():
     telemetry = StrandsTelemetry()
     telemetry.setup_otlp_exporter()
 
-    bedrock_model = create_bedrock_model()
+    bedrock_model = create_bedrock_model(
+        guardrail_id=os.getenv("BEDROCK_GUARDRAIL_ID"),
+        guardrail_version=os.getenv("BEDROCK_GUARDRAIL_VERSION", "2"),
+    )
 
     agent = create_agent(model=bedrock_model, session_manager=session_manager)
 
