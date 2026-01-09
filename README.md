@@ -2,6 +2,8 @@
 
 An AI agent for wwktm AI Conference 2026 demonstrating RAG-based knowledge base agent with evaluation capabilities using Strands framework.
 
+![Evalobility](./evalobility.png)
+
 ## Overview
 
 This project implements an AI assistant for wwktm (an ecommerce company) that intelligently answers questions about company policies, security, and compliance using AWS Bedrock Knowledge Base. The project includes robust evaluation tools for measuring output quality and tool selection accuracy.
