@@ -1,6 +1,6 @@
 # Evalobility
 
-An AI agent for wwktm AI Conference 2026 demonstrating RAG-based knowledge base agent with evaluation capabilities using Strands framework.
+An AI agent for wwktm AI Conference 2026 demonstrating RAG-based knowledge base agent with evaluation capabilities using Strands framework and Datadog LLM observability.
 
 ![Evalobility](./evalobility.png)
 
