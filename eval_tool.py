@@ -32,22 +32,22 @@ test_cases = [
     Case[str, str](
         name="password-policy-use-memory",
         input="What is the password policy?",
-        metadata={"category": "policy", "expected_tool": "memory"},
+        metadata={"category": "policy", "expected_tool": "retrieve"},
     ),
     Case[str, str](
         name="mfa-requirements-use-memory",
         input="What are the MFA requirements?",
-        metadata={"category": "policy", "expected_tool": "memory"},
+        metadata={"category": "policy", "expected_tool": "retrieve"},
     ),
     Case[str, str](
         name="rto-payment-use-memory",
         input="What is the RTO for our payment system?",
-        metadata={"category": "policy", "expected_tool": "memory"},
+        metadata={"category": "policy", "expected_tool": "retrieve"},
     ),
     Case[str, str](
         name="incident-response-use-memory",
         input="What is our incident response process?",
-        metadata={"category": "policy", "expected_tool": "memory"},
+        metadata={"category": "policy", "expected_tool": "retrieve"},
     ),
 ]
 
